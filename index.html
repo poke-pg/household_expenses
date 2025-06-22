@@ -19,7 +19,7 @@
     <table>
       <thead>
         <tr>
-          <th>day</th>
+          <th>date</th>
           <th>description</th>
           <th>withdraw</th>
           <th>deposit</th>
@@ -46,9 +46,9 @@
       console.log('csvName', csvName)
       const objectInput = data.map(row =>
         `<tr>
-          <td>${row.day}</td>
+          <td>${row.date}</td>
         <td>${row.description}</td>
-        <td>${row.withdraw}</td>
+        <td>${row.withdrawal}</td>
         <td>${row.deposit}</td>
         <td>${row.balance}</td>
         <td>${row.note}</td>
@@ -81,13 +81,59 @@
 
     const result = await response.text();
     document.getElementById('csvOutput').text = result
+    console.log('CSVアップロード結果:', result);
+
+    const customerRes = await fetch('http://localhost:3000/customer');
+
+    const data = await customerRes.json();
+  console.log('CSVデータ:', data);
+  for(const row of data) {
+    await registerTransaction(row);
+  }
   } catch (error) {
     console.error('送信エラー:', error);
     document.getElementById('csvOutput').textContent = '送信エラー';
   }
   }
-  // const sendUploadFile = () => {
-  //   const
-  // }
+  const postTransaction = async (transaction) => {
+    console.log('postTransaction:', transaction);
+    try {
+      const res = await fetch('http://localhost:3000/transaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify(transaction)
+      })
+      const data = await res.text();
+      console.log('登録結果:', data);
+    } catch (error) {
+      console.error('登録エラー:', error)
+    }
+  }
+
+  // csvUpload の後に CSVの中身をサーバ登録する関数を呼ぶ
+  const registerTransaction = async (row) => {
+    if(!row || !row.date || !row.description) {
+      console.error('Invalid row data:', row);
+      return;
+    }
+    if(row.withdrawal) {
+      row.transactionType = 'withdrawal';
+    } else if(row.deposit) {
+      row.transactionType = 'deposit';
+    } else {
+      console.error('No valid transaction type found for row:', row);
+      return;
+    }
+    const transaction = {
+      date: row.date,
+      description: row.description,
+      withdraw: row.withdrawal || 0,
+      deposit: row.deposit || 0,
+      balance: row.balance || 0,
+      note: row.note || '',
+      transactionType: row.transactionType || 'defaultType'
+    };
+    await postTransaction(transaction);
+  }
 </script>
 </html>

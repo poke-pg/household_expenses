@@ -4,15 +4,23 @@ import { parse } from 'csv-parse';
 import iconv from 'iconv-lite';
 import cors from 'cors';
 import multer from 'multer';
+import  { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv'
 
 interface MulterRequest extends express.Request {
   file?: Express.Multer.File;
 }
 
+dotenv.config();
+const prisma = new PrismaClient();
+
 const upload = multer({ dest: 'uploads/' });
 
 const app: express.Express = express();
 app.use(cors());
+// JSONリクエストをパースするためのミドルウェア
+app.use(express.json());
+
 let filePath = '';
 // const upload = multer({ dest: 'uploads/'});
 app.post('/upload', upload.single('file'), (req: MulterRequest, res:express.Response):void => {
@@ -24,6 +32,28 @@ app.post('/upload', upload.single('file'), (req: MulterRequest, res:express.Resp
   filePath = req.file.path;
 
   res.send('ファイルを受け取りました:'+ req.file.originalname);
+})
+app.get('/transaction', async (req, res) => {
+  const transaction = await prisma.transaction.findMany()
+  res.json(transaction);
+  console.log('トランザクションデータ:', transaction);
+})
+app.post('/transaction', async (req, res) => {
+  console.log('リクエストボディ:', req.body);
+  const { date, description, withdrawal ,deposit ,balance, note, transactionType } =req.body;
+  const transaction = await prisma.transaction.create({
+     data: {
+      date: new Date(date),
+      description,
+      withdrawal: Number(withdrawal),
+      deposit: Number(deposit),
+      balance: Number(balance),
+      note,
+      transactionType: transactionType || 'defaultType'
+    }
+  });
+  res.json(transaction);
+  console.log('トランザクションの作成:', transaction);
 })
 app.get('/customer', (req:express.Request, res:express.Response) => {
   const rows: object[] = [];
@@ -69,12 +99,13 @@ app.listen(3000, () => {
 
 // 日本語キー → 英語キー変換マップ
 const keyMap: Record<string, string> = {
-  '日付': 'day',
+  '日付': 'date',
   '内容': 'description',
-  '出金金額(円)': 'withdraw',
+  '出金金額(円)': 'withdrawal',
   '入金金額(円)': 'deposit',
   '残高(円)': 'balance',
-  'メモ': 'note'
+  'メモ': 'note',
+  '取引種別': 'transactionType',
 };
 
 // キーを変換する関数

@@ -15,6 +15,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TransactionType {
+  income
+  expense
+}
+
 model Transaction {
   //primary key
   id Int @id @default(autoincrement())
@@ -31,7 +36,7 @@ model Transaction {
   // 備考
   note String?
   // 取引種別
-  transactionType String
+  transactionType TransactionType
   // createdAt DateTime @default(now())
   // updatedAt DateTime @updatedAt
 }
