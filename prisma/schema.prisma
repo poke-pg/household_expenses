@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "node_modules/@prisma/client"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Transaction {
+  //primary key
+  id Int @id @default(autoincrement())
+  //取引日
+  date DateTime
+  // 取引先
+  description String
+  // 出金額
+  withdrawal Float
+  // 入金額
+  deposit Float
+  // 残高
+  balance Float
+  // 備考
+  note String?
+  // 取引種別
+  transactionType String
+  // createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
+}
