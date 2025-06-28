@@ -54,13 +54,14 @@ app.post("/transaction", async (req, res) => {
     transactionType,
   } = req.body;
   const transaction = await prisma.transaction.create({
+    // Prismaを使用してデータベースにトランザクションを作成
     data: {
       date: new Date(date),
       description,
-      withdrawal: Number(withdrawal),
-      deposit: Number(deposit),
-      balance: Number(balance),
-      note,
+      withdrawal: withdrawal || 0, // 出金がない場合は0を設定
+      deposit: deposit || 0, // 入金がない場合は0を設定
+      balance: balance, // 残高がない場合は0を設定
+      note: note || "",
       transactionType: transactionType || "defaultType",
     },
   });

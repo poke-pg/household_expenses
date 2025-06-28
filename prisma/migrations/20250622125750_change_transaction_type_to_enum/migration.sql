@@ -5,7 +5,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "TransactionType" AS ENUM ('income', 'expense');
+CREATE TYPE "TransactionType" AS ENUM ('withdrawal', 'deposit');
 
 -- AlterTable
 ALTER TABLE "Transaction" DROP COLUMN "transactionType",

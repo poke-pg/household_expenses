@@ -129,9 +129,9 @@
       const transaction = {
         date: row.date,
         description: row.description,
-        withdraw: row.withdrawal || 0,
-        deposit: row.deposit || 0,
-        balance: row.balance || 0,
+        withdrawal: Number(row.withdrawal.replace(/,/g, "")) || 0,
+        deposit: Number(row.deposit.replace(/,/g, "")) || 0,
+        balance: Number(row.balance.replace(/,/g, "")) || 0,
         note: row.note || "",
         transactionType: row.transactionType || "defaultType",
       };

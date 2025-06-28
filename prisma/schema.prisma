@@ -16,8 +16,8 @@ datasource db {
 }
 
 enum TransactionType {
-  income
-  expense
+  withdrawal
+  deposit
 }
 
 model Transaction {
@@ -28,9 +28,9 @@ model Transaction {
   // 取引先
   description String
   // 出金額
-  withdrawal Float
+  withdrawal Float?
   // 入金額
-  deposit Float
+  deposit Float?
   // 残高
   balance Float
   // 備考
